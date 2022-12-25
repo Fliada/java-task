@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -5,15 +8,44 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Program {
-    final static Path rscdirectory = Paths.get("/rsc");
-    public static void Main()
-    {
-        if(Files.exists(rscdirectory) && Files.isDirectory(rscdirectory))
-            try (DirectoryStream<Path> dirStream =
-                         Files.newDirectoryStream(rscdirectory)) {
 
-            } catch (IOException e) {
-                throw new RuntimeException("Такого файла или директории не существует");
+    public static void main(String[] args)
+    {
+        Path rscdirectory = Paths.get("rsc");
+        String line       = "three";
+
+        printFiles(rscdirectory, line);
+    }
+
+    static void printFiles(Path directory, String line) {
+        try (DirectoryStream<Path> dirStream =
+                     Files.newDirectoryStream(directory)) {
+            for (Path child: dirStream) {
+                int lastInd = child.getFileName().toString().lastIndexOf(".");
+                if(lastInd != -1 && child.getFileName().toString().substring(lastInd + 1).equals("txt")
+                    && fileHasLine(child, line))
+                    System.out.println(child.getFileName());
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка ввода-вывода");
+        }
+    }
+
+    static boolean fileHasLine(Path file, String line) {
+        boolean has = false;
+
+        try (BufferedReader bf = new BufferedReader(new FileReader(file.toFile()))) {
+            String str;
+            while ((str = bf.readLine()) != null && !has) {
+                if(str.equals(line))
+                    has = true;
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("Файл не был найден");
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка ввода-вывода");
+        }
+
+        return has;
     }
 }
