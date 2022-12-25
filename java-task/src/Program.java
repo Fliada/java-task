@@ -12,17 +12,18 @@ public class Program {
     public static void main(String[] args)
     {
         Path rscdirectory = Paths.get("rsc");
-        String line       = "three";
+        String line       = "two";
 
         printFiles(rscdirectory, line);
-    }
+    }ч
 
     static void printFiles(Path directory, String line) {
         try (DirectoryStream<Path> dirStream =
                      Files.newDirectoryStream(directory)) {
             for (Path child: dirStream) {
-                int lastInd = child.getFileName().toString().lastIndexOf(".");
-                if(lastInd != -1 && child.getFileName().toString().substring(lastInd + 1).equals("txt")
+                String fileName = child.getFileName().toString();
+                int lastInd = fileName.lastIndexOf(".");
+                if(lastInd != -1 && fileName.substring(lastInd + 1).equals("txt")
                     && fileHasLine(child, line))
                     System.out.println(child.getFileName());
             }
